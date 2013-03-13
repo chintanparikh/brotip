@@ -1,5 +1,16 @@
 #!/usr/bin/env ruby
 
-require 'feedzirra'
-ATOM_FEED_URL = 'http://www.brotips.com/recent.atom'
-puts Feedzirra::Feed.fetch_and_parse(ATOM_FEED_URL).entries.first.content.gsub('<br>', '').gsub("\n", ' ').split('. ').map {|s| s.slice(0, 1).capitalize + s.slice(1..-1)}.join('. ')
+BEGIN { $VERBOSE = nil }
+
+RECENT_FEED_URL = 'http://www.brotips.com/recent.atom'
+RANDOM_URL = 'http://www.brotips.com/random'
+if (ARGV[0] == "random")
+  require 'nokogiri'
+  require 'open-uri'
+  page = Nokogiri::HTML(open(RANDOM_URL))
+  tip = page.css('.tip-container p').text
+  puts tip.gsub('<br>', '').gsub("\n", ' ').split('. ').map {|s| s.slice(0, 1).capitalize + s.slice(1..-1)}.join('. ')
+else
+  require 'feedzirra'
+  puts Feedzirra::Feed.fetch_and_parse(RECENT_FEED_URL).entries.first.content.gsub('<br>', '').gsub("\n", ' ').split('. ').map {|s| s.slice(0, 1).capitalize + s.slice(1..-1)}.join('. ')
+end
